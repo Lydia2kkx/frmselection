@@ -82,24 +82,31 @@ i <- 5
 sort(c(ind,i)[-j])
 
 
+x <- cbind(rep(1,nrow(x)), x)
+p <- ncol(x)
+n <- nrow(x)
+
 both.1 <- function(x,y){
+  x <- cbind(rep(1,nrow(x)), x)
+  p <- ncol(x)
+  result <- list()
+  criteria <- vector()
   for(i in 2:p){
-    m <- 1
-    k <- 2
-    result <- list()
-    criteria <- vector()
-    result[[i]] <- frm(y, x[, i, drop = FALSE], linkfrac = "logit", table = FALSE)
-    criteria[i] <- -2*ll_logit(result[[i]]$p, x[,c(1,i)], y) + k * m
+    result[[i]] <- frm(y, x[,i,drop = FALSE], linkfrac="logit", table = FALSE)
+    criteria[i] <- -2*ll_logit(result[[i]]$p, x[,c(1,i)], y) + 4
   }
-  criteria_old <- min(na.omit(criteria))
-  ind <- which.min(criteria)
-  return(list(min = criteria_old, index = ind - 1))
+  min_criteria <- min(na.omit(criteria))
+  index <- which.min(criteria)-1
+  variable <- paste0("X", index)
+  return( list(min = min_criteria, index = index, variable = variable))
 }
 both.1(x,y)
 
 both.2 <- function(x,y){
   first_step <- both.1(x,y)
   ind <- first_step$index + 1
+  x <- cbind(rep(1,nrow(x)), x)
+  p <- ncol(x)
   result <- list()
   criteria <- vector()
   for(i in 2:p){
@@ -112,20 +119,29 @@ both.2 <- function(x,y){
   index.new <- which.min(criteria)-1
   index <- c(first_step$index, index.new)
   variable <- paste0("X", index)
-  #return(result$p)
   return(list(min = min_criteria, index = index, variable = variable))
 }
 both.2(x,y)
 
+#' Title
+#'
+#' @param x
+#' @param y
+#'
+#' @return
+#' @export
+#'
+#' @examples
 both.3 <- function(x,y){
   first_step <- both.2(x,y)
   ind <- first_step$index + 1
+  x <- cbind(rep(1,nrow(x)), x)
+  p <- ncol(x)
   result_for <- list()
   criteria_for <- vector()
   result_back <- list()
   criteria_back <- vector()
   criteria_back_min <- NULL
-  ind_back <- list()
   ind_back_min <- vector()
   m <- 3
   k <- 2
@@ -137,13 +153,14 @@ both.3 <- function(x,y){
         if(is.na(j)){
           next
         }else{
-          result_back[[j]] <- frm(y, x[,sort(c(ind,i))[-which(j==ind)], drop = FALSE], linkfrac="logit", table = FALSE)
+          ind_back <- matrix()
+          result_back[[j]] <- frm(y, x[,sort(c(i,ind[-which(j==ind)])), drop = FALSE], linkfrac="logit", table = FALSE)
           criteria_back[j] <- -2*ll_logit(result_back[[j]]$p, x[,sort(c(1,ind[-which(j==ind)],i))], y) + k*(m-1)
-          #ind_back[[i]][j,] <- sort(c(i,ind[-which(j==ind)]))
+          ind_back[j,] <- sort(c(i,ind[-which(j==ind)]))
         }
       }
       criteria_back_min[i] <- min(na.omit(criteria_back))
-      #ind_back_min[i] <- ind_back[[i]][which(criteria_back_min[i]),]
+      ind_back_min[i,] <- ind_back[which(criteria_back_min[i]),]
     }
   }
   criteria_min <- min(na.omit(c(criteria_for, criteria_back_min)))
@@ -154,12 +171,16 @@ both.3(x,y)
 traceback()
 
 
-
+matrix(c(1,2,NA,NA), nrow = 2, byrow = TRUE)
 
 head(x)
 ind1 <- c(4,3,6)
+com <- combn(ind1, 2)
+length(ind1)
+c(com[,2],5)
 i <- 2
-j <- 3
+j <- 2
+sort(c(i,ind1[-which(j==ind1)]))
 sort(c(i,ind1[-which(j==ind1)]))
 sort(c(1,ind1[-which(j==ind1)],i))
 head(x[,sort(c(ind,i)[-j]), drop = FALSE])
@@ -178,34 +199,52 @@ for(j in mm){
 }
 v
 
-
-
-both.2 <- function(x,y){
-  first_step <- both.1(x,y)
+both.3 <- function(x,y){
+  first_step <- both.2(x,y)
   ind <- first_step$index + 1
   result_for <- list()
   criteria_for <- vector()
-  m <- 2
+  result_back <- list()
+  criteria_back <- vector()
+  criteria_back_min <- vector()
+  ind_for <- list()
+  ind_back <- list()
+  m <- 3
   k <- 2
   for(i in 2:p){
     if(!(i %in% ind)){
       result_for[[i]] <- frm(y, x[, sort(c(ind,i)), drop = FALSE], linkfrac = "logit", table = FALSE)
       criteria_for[i] <- -2*ll_logit(result_for[[i]]$p, x[,sort(c(1,ind,i))], y) + k * m
-      for(j in sort(ind)){
-        result_back[[j]] <- frm(y, x[, sort(ind)[-which(j==ind)], drop = FALSE], linkfrac = "logit", table = FALSE)
-        criteria_back[j] <- -2*ll_logit(result_back[[j]]$p, x[,sort(c(1,ind))[-which(j==ind)]], y) + k*(m-1)
+      ind_for[[i]] <- c(ind,i)
+      n <- length(ind)
+      if(n <=1){
+        next
+      }else{
+        com <- combn(ind,n-1)
+        for(j in 1:n){
+          result_back[[j]] <- frm(y, x[, sort(c(com[,j],i)), drop = FALSE], linkfrac="logit", table = FALSE)
+          criteria_back[j] <- -2*ll_logit(result_back[[j]]$p, x[,sort(c(1,com[,j],i))], y)+ k*(m-1)
+        }
+        criteria_back_min[i] <- min(na.omit(criteria_back))
+        ind_back[[i]] <- c(list(com[, which.min(criteria_back)]),i)
+        if(criteria_back_min[i] < criteria_for[i]){
+          criteria_for[i] <- criteria_back_min[i]
+          ind_for[[i]] <- ind_back[[i]]
+        }
       }
-
     }
   }
-  criteria_min <- min(na.omit(c(criteria_for, criteria_back_min)))
-  if(any(criteria_back_min == criteria_min)){
-    ind <- ind_back_min[which.min(criteria_back_min)]
-  }else{
-    ind <- c(ind, which.min(criteria_for))
-  }
-  index <- ind - 1
-  variable <- paste0("X", index)
-  return(list(min = criteria_for_min, index = index, variable = variable))
+  criteria_min <- min(na.omit(criteria_for))
+  ind <- ind_for[[which.min(criteria_for)]]-1
+  variable <- paste0("X", ind)
+  return(list(min = criteria_min, index = ind, variable = variable))
 }
-both.2(x,y)
+
+both.3(x,y)
+
+i <- 2
+ind <- c(4,1,3)
+n <- length(ind)
+com <- combn(ind,n-1)
+j <- 3
+sort(c(com[,j],i))

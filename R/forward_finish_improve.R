@@ -22,19 +22,34 @@ forward <- function(x,y, criterion = c("AIC", "BIC")){
     k <- 2
   }
   if(criterion == "BIC"){
+    n <- nrow(x)
     k <- log(n)
   }
-  ind <- NULL
-  m <- 1
-  result_old <- frm(y, x[,2,drop = FALSE], linkfrac="logit", table = FALSE)
-  criteria_old <- -2*ll_logit(result_old$p, x[,sort(c(1:2))], y) + k * m
+  x <- cbind(rep(1,nrow(x)), x)
+  p <- ncol(x)
+  forward.1 <- function(x,y){
+    result <- list()
+    criteria <- vector()
+    for(i in 2:p){
+      result[[i]] <- frm(y, x[,i,drop = FALSE], linkfrac="logit", table = FALSE)
+      criteria[i] <- -2*ll_logit(result[[i]]$p, x[,c(1,i)], y)
+    }
+    min_criteria <- min(na.omit(criteria))
+    index <- which.min(criteria)-1
+    variable <- paste0("X", index)
+    return( list(min = min_criteria, index = index, variable = variable))
+  }
+  first_step <- forward.1(x,y)
+  ind <- first_step$index + 1
+  criteria_old <- first_step$min + k * 2
+  m <- 2
   repeat{
     result <- list()
     criteria <- vector()
     for(i in 2:p){
       if(!(i %in% ind)){
         result[[i]] <- frm(y, x[, sort(c(ind,i)), drop = FALSE], linkfrac = "logit", table = FALSE)
-        criteria[i] <- -2*ll_logit(result[[i]]$p, x[,sort(c(1,ind,i))], y) + k * m
+        criteria[i] <- -2*ll_logit(result[[i]]$p, x[,sort(c(1,ind,i))], y) + k * (m+1)
       }
     }
     criteria_new <- min(na.omit(criteria))
@@ -47,7 +62,7 @@ forward <- function(x,y, criterion = c("AIC", "BIC")){
   }
   min_criteria <- criteria_old
   index <- ind - 1
-  variable <- paste0("X", index)
+  variable <- colnames(x)[ind]
   return(list(min = min_criteria, index = index, variable = variable))
 }
 
