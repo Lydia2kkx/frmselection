@@ -263,4 +263,3 @@ lines(num, criteria_hq, type = "b", lwd = 2, col = "blue")
 legend("topright", legend = c("AIC", "BIC", "HQ"), col = c("black", "red", "blue"), lwd = 2)
 
 
-1-pchisq(11.085,4)

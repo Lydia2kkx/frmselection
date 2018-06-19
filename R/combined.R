@@ -2,7 +2,7 @@
 frmselect <- function(x,y, criterion = c("AIC", "BIC", "HQ"),
                       linkfrac = c("logit", "probit", "loglog", "cloglog", "cauchit"),
                       method = c("forward", "backward", "both", "allsubsets")){
-  if(missing(x) || missing(y)){
+  if(any(missing(x) || missing(y))){
     stop("Error: Missing data")
   }
   if(is.null(colnames(x))){
