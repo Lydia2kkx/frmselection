@@ -3,15 +3,24 @@ lasso_select <- function(x, y, family = "beta", nlambda = 100, upper = 1e+08, lo
   ind <- sapply(x, is.factor)
   #select the factor variables, which are penalized differently compared to the common variable
   ind <- which(ind)
-  f1 <- as.formula(paste(" ~ ", paste(xname[-ind], collapse = "+")))
-  f2 <- as.formula(paste(" ~ ", paste(xname[ind], collapse = "+")))
-  formula <- y ~ la(f1) + la(f2)
+  f1 <- paste(xname[-ind], collapse = "+")
+  f2 <- paste(xname[ind], collapse = "+")
+  f1 <- formula(f1)
+  f2 <- formula(f2)
+  #assign('f1', f1, pos=.GlobalEnv)
+  #assign('f2', f2, pos=.GlobalEnv)
+  formula <- y ~ la(~f1) + la(~f2)
   b <- bamlss(formula, data = data, family = family, sampler = FALSE,
               optimizer = lasso, nlambda = nlambda, upper = upper, lower = lower,
               multiple = FALSE)
   coefi <- coef(b)
-  return(list(formula, f1, f2))
+  return(list(formula = c(f1, f2, formula), coefficient = coefi))
 }
+lasso_select(d1, d$bnum, data = d)
+
+
+lasso_select(subx, suby, data = subdat)
+
 
 set.seed(123)
 d <- GAMart()
@@ -24,12 +33,9 @@ lasso_select(d1, d$bnum, data = d)
 
 xnam <- paste0("x", 1:3)
 f <- as.formula(paste(" ~ ", paste(xnam, collapse = "+")))
+
 ind <- sapply(d1, is.factor)
 ind <- which(ind)
-fa <- d1[,ind]
-head(fa)
-ot <- d1[,-ind]
-head(ot)
 f1 <- bnum ~ la(f)+la(id)
 b <- bamlss(f1, data = d, family = "beta", sampler = FALSE,
             optimizer = lasso, nlambda = 100, upper = 1e+08, lower = 1e+03,
@@ -44,6 +50,8 @@ formula <- bnum ~ la(f1) + la(f2)
 b <- bamlss(formula, data = d, family = "beta", sampler = FALSE,
             optimizer = lasso, nlambda = 100, upper = 1e+08, lower = 1e+03,
             multiple = FALSE)
+
+
 summary(b)
 
 f1 <- as.formula(paste(" ~ ", paste(xname[-ind], collapse = "+")))

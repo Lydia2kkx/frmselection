@@ -244,7 +244,7 @@ y <- dat[,1]
 x <- cbind(dat[,2], log(dat[,3]), log(dat[,3])^2, dat[,4], (dat[,4])^2, dat[,5])
 colnames(x) <- c("mrate", "lemp", "lemp2","age", "age2","sole")
 
-frmselect(x,y, criterion = "BIC",linkfrac = "logit", method = "forward")
+a <- frmselect(x,y, criterion = "BIC",linkfrac = "logit", method = "forward")
 frmselect(x,y, criterion = "AIC",linkfrac = "logit", method = "allsubsets")
 frmselect(x,y, criterion = "AIC",linkfrac = "logit", method = "backward")
 frmselect(x,y, criterion = "AIC",linkfrac = "logit", method = "forward")

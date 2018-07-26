@@ -12,7 +12,7 @@ subx <- as.matrix(subdat[,-1])
 betaselect <- function(x, y, criterion = c("AIC", "BIC", "HQ"),
                        link = c("logit", "probit", "cloglog", "cauchit", "log", "loglog"),
                        method = c("forward", "backward", "both", "allsubsets")){
-  if(missing(x) || missing(y)){
+  if(any(missing(x) || missing(y))){
     stop("Error: Missing data")
   }
   if(is.null(colnames(x))){
