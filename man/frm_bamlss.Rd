@@ -23,6 +23,7 @@ strictly smaller than 1, otherwise it might be a warning that the backfitting al
 }
 \examples{
 set.seed(123)
-d <- bamlss::GAMart()
-b <- bamlss::bamlss(bnum ~ x1 + x2 + x3, data = d, family = frm_bamlss(link = "logit") ,sampler = FALSE, multiple = FALSE)
+library(bamlss)
+d <- GAMart()
+b <- bamlss(bnum ~ x1 + x2 + x3, data = d, family = frm_bamlss(link = "logit") ,sampler = FALSE, multiple = FALSE)
 }
