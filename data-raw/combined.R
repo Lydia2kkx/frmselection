@@ -1,4 +1,21 @@
-#Combined frm selection function
+#' Title fractional model selection function
+#'frmselect is used to select a formula-based model by information criterions of fractional regression models.
+#'
+#' @usage frmselect(x, y, criterion="AIC",linkfrac="logit", method="forward")
+#'
+#' @param x a numeric matrix, with column names, containing the values of the covariates.
+#' @param y a numeric vector containing the values of the response variable. It should between 0 and 1.
+#' @param criterion model selection critetion. Available options: AIC, BIC, HQ.The default value is AIC.
+#' @param linkfrac link function, Available options: logit, probit, loglog, cloglog, cauchit.The default value is logit.
+#' @param method the mode of stepwise search and allsubsets. Available options: forward, backward, both, allsubsets.The default value is forward.
+#'
+#'
+#' @return
+#' @export
+#'
+#'
+#' @examples
+
 frmselect <- function(x,y, criterion = c("AIC", "BIC", "HQ"),
                       linkfrac = c("logit", "probit", "loglog", "cloglog", "cauchit"),
                       method = c("forward", "backward", "both", "allsubsets")){

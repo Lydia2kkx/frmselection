@@ -126,24 +126,27 @@ library("bamlss")
 #library("stats")
 set.seed(123)
 d <- GAMart()
-head(d)
+#head(d)
 #d$id
 #f <- bnum ~ la(~x1+x2+x3)+la(id)
 b <- bamlss(bnum ~ x1 + x2 + x3, data = d, family = "frm_bamlss"(link = "logit") ,sampler = FALSE,
             multiple = FALSE)
-b <- bamlss(bnum ~ x1 + x2 + x3, data = d, family = "frm_bamlss"(link = "probit") ,sampler = FALSE,
+b1 <- bamlss(bnum ~ x1 + x2 + x3, data = d, family = "frm_bamlss"(link = "probit"),sampler = FALSE,
              multiple = FALSE)
 # higher derivatives of link "loglog" not available!
 b <- bamlss(bnum ~ x1 + x2 + x3, data = d, family = "frm_bamlss"(link = "loglog") ,sampler = FALSE,
             multiple = FALSE)
 summary(b)
 coef(b)
+coef(b1)
 #Check whether the function is right, comparing the estimated coefficients with frm()
 x <- cbind(d$x1, d$x2, d$x3)
 colnames(x) <- c("x1", "x2", "x3")
-a <- frm::frm(d$bnum, x, linkfrac = "logit")
-a1 <- frm::frm(d$bnum, x, linkfrac = "probit")
-#If the factor covariate id is included, these two functions would treat id differently and coefficients would be different
+a <- frm::frm(d$bnum, x, linkfrac = "logit", table = FALSE)
+a$p
+a1 <- frm::frm(d$bnum, x, linkfrac = "probit", table = FALSE)
+a1$p
+b#If the factor covariate id is included, these two functions would treat id differently and coefficients would be different
 b <- bamlss(bnum ~ x1 + x2 + x3 + id, data = d, family = "frm_bamlss", sampler = FALSE,
             multiple = FALSE)
 coef(b)
