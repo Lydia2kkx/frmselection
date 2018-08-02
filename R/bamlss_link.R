@@ -14,10 +14,9 @@
 #' @export
 #'
 #' @examples
-#' library("bamlss")
 #' set.seed(123)
-#' d <- GAMart()
-#' b <- bamlss(bnum ~ x1 + x2 + x3, data = d, family = frm_bamlss(link = "logit") ,sampler = FALSE, multiple = FALSE)
+#' d <- bamlss::GAMart()
+#' b <- bamlss::bamlss(bnum ~ x1 + x2 + x3, data = d, family = frm_bamlss(link = "logit") ,sampler = FALSE, multiple = FALSE)
 
 
 

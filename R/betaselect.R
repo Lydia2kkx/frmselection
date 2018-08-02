@@ -11,8 +11,6 @@
 #' @param link link function, Available options: logit, probit, loglog, cloglog, log, cauchit.The default value is logit.
 #' @param method the mode of stepwise search and allsubsets. Available options: forward, backward, both, allsubsets.The default value is forward.
 #'
-#' @import betareg
-#'
 #' @return A list contains information criterion, link function, model selection method,
 #' minimal value of information criterion, the order of variables which are chosen in the model,
 #' the names of corresonding variables and the estimated coefficients of them.

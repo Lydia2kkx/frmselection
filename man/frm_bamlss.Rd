@@ -4,7 +4,7 @@
 \alias{frm_bamlss}
 \title{Bamlss quasi-binomial family}
 \usage{
-frm_bamlss(link = c("logit", "probit"), ...)
+frm_bamlss(link = "logit", ...)
 }
 \arguments{
 \item{link}{link function, Available options: logit, probit}
@@ -16,9 +16,13 @@ This is a quasi-binomial family which is suitable for bamlss() function in bamls
 This quasi-binomial family only contains two link functions, which are used mostly in the economics,
 logit and probit function.
 }
+\details{
+It is a family of bamlss package, can be used in the bamlss() function. The data type is
+the fractional data which is between 0 and 1. Especially for probit link, the response data should be
+strictly smaller than 1, otherwise it might be a warning that the backfitting algorithm did not converge!
+}
 \examples{
-library("bamlss")
 set.seed(123)
-d <- GAMart()
-b <- bamlss(bnum ~ x1 + x2 + x3, data = d, family = "frm_bamlss"(link = "logit") ,sampler = FALSE, multiple = FALSE)
+d <- bamlss::GAMart()
+b <- bamlss::bamlss(bnum ~ x1 + x2 + x3, data = d, family = frm_bamlss(link = "logit") ,sampler = FALSE, multiple = FALSE)
 }
