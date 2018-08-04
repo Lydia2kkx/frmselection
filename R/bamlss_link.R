@@ -4,6 +4,8 @@
 #'This quasi-binomial family only contains two link functions, which are used mostly in the economics,
 #'logit and probit function.
 #'
+#' @usage frm_bamlss(link = "logit",...)
+#'
 #' @param link link function, Available options: logit, probit
 #' @param ... Arguments to pass to bamlss
 #'

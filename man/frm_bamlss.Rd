@@ -4,7 +4,7 @@
 \alias{frm_bamlss}
 \title{Bamlss quasi-binomial family}
 \usage{
-frm_bamlss(link = "logit", ...)
+frm_bamlss(link = "logit",...)
 }
 \arguments{
 \item{link}{link function, Available options: logit, probit}
