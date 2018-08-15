@@ -1,4 +1,3 @@
-
 #' fractional model selection function based on beta regression
 #'
 #' betaselect is used to select a formula-based model by information criterions of fractional regression models.
