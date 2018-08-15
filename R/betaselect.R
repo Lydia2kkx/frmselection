@@ -13,18 +13,17 @@
 #'
 #' @return A list contains information criterion, link function, model selection method,
 #' minimal value of information criterion, the order of variables which are chosen in the model,
-#' the names of corresonding variables and the estimated coefficients of them.
+#' the names of corresponding variables and the estimated coefficients of them.
 #'
 #' @export
 #'
 #' @examples
-#'N <- 250
-#'u <- rnorm(N)
-#'X <- cbind(rnorm(N),rnorm(N), rnorm(N),rnorm(N))
-#'dimnames(X)[[2]] <- c("X1","X2","X3", "X4")
-#'ym <- exp(X[,1]+X[,2]+X[,3]+X[,4]+u)/(1+exp(X[,1]+X[,2]+X[,3]+X[,4]+u))
-#'y <- rbeta(N,ym*20,20*(1-ym))
-#betaselect(X, y)
+#' set.seed(123)
+#' library(bamlss)
+#' d <- GAMart()
+#' x <- data.frame(d$x1, d$x2, d$x3)
+#' y <- d$bnum
+#' betaselect(x, y)
 
 
 betaselect <- function(x, y, criterion = "AIC",link = "logit", method = "forward"){
@@ -43,6 +42,9 @@ betaselect <- function(x, y, criterion = "AIC",link = "logit", method = "forward
   }
   if(length(y)!= nrow(x)){
     stop("Error: The length of x and y are different")
+  }
+  if(any(y>=1 | y<=0)){
+    stop("Error: invalid dependent variable, all observations must be in (0, 1) ")
   }
   linkfun <- c("logit", "probit", "cloglog", "cauchit", "log", "loglog")
   if (!link %in% linkfun){
@@ -76,7 +78,7 @@ betaselect <- function(x, y, criterion = "AIC",link = "logit", method = "forward
   forward <- function(x,y){
     forward.1 <- function(x,y){
       result <- list()
-      criteria <- vector()
+      criteria <- numeric()
       for(i in 1:p){
         result[[i]] <- betareg::betareg(y ~ x[,i], link = link)
         criteria[i] <- -2 * result[[i]]$loglik + k*(1 + 2)
@@ -92,7 +94,7 @@ betaselect <- function(x, y, criterion = "AIC",link = "logit", method = "forward
     m <- 3
     repeat{
       result <- list()
-      criteria <- vector()
+      criteria <- numeric()
       for(i in 1:p){
         if(!(i %in% ind)){
           result[[i]] <- betareg::betareg(y ~ x[,sort(c(ind,i))], link = link)
@@ -123,7 +125,7 @@ betaselect <- function(x, y, criterion = "AIC",link = "logit", method = "forward
     m <- 1
     repeat{
       result <- list()
-      criteria <- vector()
+      criteria <- numeric()
       for(i in 1:p){
         if(!(i %in% ind)){
           result[[i]] <- betareg::betareg(y ~ x[,-sort(c(ind,i))], link = link)
@@ -157,7 +159,7 @@ betaselect <- function(x, y, criterion = "AIC",link = "logit", method = "forward
   both <- function(x,y){
     both.1 <- function(x,y){
       result <- list()
-      criteria <- vector()
+      criteria <- numeric()
       for(i in 1:p){
         result[[i]] <- betareg::betareg(y ~ x[,i], link = link)
         criteria[i] <- -2 * result[[i]]$loglik + k*(1 + 2)
@@ -172,10 +174,10 @@ betaselect <- function(x, y, criterion = "AIC",link = "logit", method = "forward
     m <- 3
     repeat{
       result_for <- list()
-      criteria_for <- vector()
+      criteria_for <- numeric()
       result_back <- list()
-      criteria_back <- vector()
-      criteria_back_min <- vector()
+      criteria_back <- numeric()
+      criteria_back_min <- numeric()
       ind_for <- list()
       ind_back <- list()
       for(i in 1:p){
@@ -226,7 +228,7 @@ betaselect <- function(x, y, criterion = "AIC",link = "logit", method = "forward
       count <- choose(p, i)
       com <- combn(p, i)
       result <- list()
-      criteria <- vector()
+      criteria <- numeric()
       for(j in 1:count){
         result[[j]] <- betareg::betareg(y ~ x[, com[,j]], link = link)
         criteria[j] <- -2 * result[[j]]$loglik + k * (i + 2)

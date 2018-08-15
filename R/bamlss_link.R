@@ -21,8 +21,6 @@
 #' d <- GAMart()
 #' b <- bamlss(bnum ~ x1 + x2 + x3, data = d, family = frm_bamlss(link = "logit") ,sampler = FALSE, multiple = FALSE)
 
-
-
 frm_bamlss <- function(link = "logit", ...)
 {
   linkfun <- c("logit", "probit")

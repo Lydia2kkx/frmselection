@@ -1,12 +1,14 @@
 Package: frmselection
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Model Selection Tools for Fractional Response Models
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: Yao Lu
+Maintainer: Yao Lu <yao.lu01@stud.uni-goettingen.de>
+Description: This package performs a model selection procedure of fractional response models.
+    This package offers stepwise regression (forward, backward and both stepwise methods), 
+    all-subsets selection and lasso procedure based on frm, betareg and bamlss package. 
+    Furthermore, quasi-binomial family for bamlss package is also offered.
+License: GPL-2
 Encoding: UTF-8
 LazyData: true
 Suggests: testthat

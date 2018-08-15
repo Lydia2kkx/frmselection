@@ -1,0 +1,105 @@
+---
+title: "Application"
+author: "Yao Lu"
+output: pdf_document
+---
+
+```{r}
+#case
+setwd("E:/Master/Programming with R")
+dat <- read.table("401kjae.txt")
+y <- dat[,1]
+x <- cbind(dat[,2], log(dat[,3]), log(dat[,3])^2, dat[,4], (dat[,4])^2, dat[,5])
+summary(dat)
+#The standard deviation of variables
+sqrt(diag(var(dat)))
+colnames(x) <- c("mrate", "lemp", "lemp2","age", "age2","sole")
+#QMLE
+library(frm)
+f <- frm(y, x, linkfrac = "logit", table = FALSE)
+f$p
+#The standard deviation of estimated coefficients
+sqrt(diag(f$p.var))
+
+x <- as.data.frame(x, row.names = TRUE)
+#OLS
+ols <- lm(y ~ x$mrate + x$lemp + x$lemp2 + x$age + x$age2 +x$sole)
+coef(ols)
+
+```
+
+```{r}
+#frmselect() to do the model selection
+#The four examples
+x <- as.matrix(x, row.names = TRUE)
+frmselect(x,y, criterion = "AIC",linkfrac = "logit")#The default is forward
+#frmselect(x,y, criterion = "AIC",linkfrac = "logit", method = "allsubsets") 
+#frmselect(x,y, criterion = "AIC",linkfrac = "logit", method = "backward")
+#frmselect(x,y, criterion = "AIC",linkfrac = "logit", method = "both")
+
+```
+
+```{r}
+#betaselect() to do the model selection
+#The four examples
+newdat <- data.frame(y, x)
+subdat <- newdat[y<1,]
+suby <- subdat[,1]
+subx <- subdat[,-1]
+subx <- as.matrix(subdat[,-1])
+nrow(subx)
+betaselect(subx, suby)
+#betaselect(subx, suby, method = "backward")
+#betaselect(subx, suby, method = "both")
+#betaselect(subx, suby, method = "allsubsets")
+```
+
+```{r}
+#Another way by replacing 1 with 0.9999
+y[y==1] <- 0.9999
+betaselect(x, y)
+#betaselect(x, y, method = "backward")
+#betaselect(x, y, method = "both")
+#betaselect(x, y, method = "allsubsets")
+
+```
+
+```{r}
+#Testing whether the modified quasi-binomial family frm_bamlss()function works
+x <- as.data.frame(x, row.names = TRUE)
+y <- dat[,1]
+d <- data.frame(y,x)
+formula <- as.formula(paste("y ~ ", paste(colnames(x), collapse = "+")))
+library(bamlss)
+b <- bamlss(formula, data = d, family = frm_bamlss(link = "logit") ,sampler = FALSE,
+            multiple = FALSE)
+coef(b)
+f <- frm::frm(y, x, linkfrac = "logit", table = FALSE)
+f$p
+
+```
+
+```{r}
+
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```

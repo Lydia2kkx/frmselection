@@ -1,24 +1,24 @@
-#The procedure of lasso selection
-set.seed(123)
-library(bamlss)
-d <- GAMart()
-x <- d[,c(9:11,13)]
-head(x)
-y <- d$bnum
-xname <- colnames(x)
-ind <- sapply(x, is.factor)
-#select the factor variables, which are penalized differently compared to the common variable
+setwd("E:/Master/Programming with R")
+dat <- read.table("401kjae.txt")
+y <- dat[,1]
+x <- cbind(dat[,2], log(dat[,3]), log(dat[,3])^2, dat[,4], (dat[,4])^2, dat[,5])
+colnames(x) <- c("mrate", "lemp", "lemp2","age", "age2","sole")
+x <- as.data.frame(x, row.names = TRUE)
+d <- data.frame(y,x)
+d$sole <- as.factor(d$sole)
+subdat <- d[y<1,]
+suby <- subdat[,1]
+subx <- subdat[,-1]
+xname <- colnames(subx)
+ind <- sapply(subx, is.factor)
 ind <- which(ind) #find the index of the factor variables
 f1 <- as.formula(paste(" ~ ", paste(xname[-ind], collapse = "+")))
 f2 <- as.formula(paste(" ~ ", paste(xname[ind], collapse = "+")))
 formula <- y ~ la(f1) + la(f2) #form the formula with two kinds of variables
-b <- bamlss(formula, data = d, family = frm_bamlss("logit"), sampler = FALSE,
-                    optimizer = lasso, nlambda = 100, upper = 1e+08, lower = 1e+03,
-                    multiple = FALSE)
+b <- bamlss(formula, data = subdat, family = "beta", sampler = FALSE,
+            optimizer = lasso, nlambda = 100, upper = 1e+03, lower = 1e-01,
+            multiple = FALSE)
 coefi <- coef(b)
-#The coefficients include the common variable, the lambda parameter(penalized with lasso) of common variables,
-#the factor variables(different levels of factor variables have different coefficients),
-#the lambda parameter(penalized with lasso) of factor variables and the intercept
 
 lasso.select <- function(x, coefficent, threshold = 1e-3){
   n <- length(coefficent) #n is the number of the coefficients
@@ -45,8 +45,12 @@ lasso.select <- function(x, coefficent, threshold = 1e-3){
   }
   return(list(lambda.common = lambda.common, lambda.factor = lambda.factor, lasso.index = lasso.index, modified.coefficients = coefi.new))
 }
-a <- lasso.select(x, coefi)
-a$lambda.common
-a$lambda.factor
-a$lasso.index
-a$modified.coefficients
+a <- lasso.select(subx, coefi)
+a
+
+
+gy1 <- betareg::betareg(suby ~ mrate + lemp + lemp2 + age + age2 + sole, data = subx)
+gy1$coefficients
+b <- bamlss(suby ~ mrate + lemp + lemp2 + age + age2 + sole, data = subdat, family = "beta", sampler = FALSE,
+            multiple = FALSE)
+coefi <- coef(b)

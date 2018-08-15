@@ -18,9 +18,11 @@ coef(b)
 f <- frm(y, x, linkfrac = "logit", table = FALSE)
 f$p
 ###probit link
-b1 <- bamlss(formula, data = d, family = frm_bamlss(link = "probit") ,iter = 10000, sampler = FALSE,
+b1 <- bamlss(formula, data = d, family = frm_bamlss(link = "probit") ,sampler = FALSE,
             multiple = FALSE)
 coef(b1)
+b2 <- bamlss(formula, data = d, start = coef(b1), sampler = FALSE,
+             multiple = FALSE) #doesn't work!
 f1 <- frm(y, x, linkfrac = "probit", table = FALSE)
 f1$p
 #############If the response data are smaller than 1, then it works

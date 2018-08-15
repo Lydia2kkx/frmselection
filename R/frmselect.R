@@ -13,19 +13,17 @@
 #'
 #' @return A list contains information criterion, link function, model selection method,
 #' minimal value of information criterion, the order of variables which are chosen in the model,
-#' the names of corresonding variables and the estimated coefficients of them.
+#' the names of corresponding variables and the estimated coefficients of them.
 #'
 #' @export
 #'
 #' @examples
-#'N <- 250
-#'u <- rnorm(N)
-#'X <- cbind(rnorm(N),rnorm(N), rnorm(N),rnorm(N))
-#'dimnames(X)[[2]] <- c("X1","X2","X3", "X4")
-#'ym <- exp(X[,1]+X[,2]+X[,3]+X[,4]+u)/(1+exp(X[,1]+X[,2]+X[,3]+X[,4]+u))
-#'y <- rbeta(N,ym*20,20*(1-ym))
-#'y[y > 0.9] <- 1
-#'frmselect(X,y, method = "forward")
+#' set.seed(123)
+#' library(bamlss)
+#' d <- GAMart()
+#' x <- as.matrix(data.frame(d$x1, d$x2, d$x3))
+#' y <- d$bnum
+#' frmselect(x, y)
 
 frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forward"){
   #The first part, check the conditions whether the given command is satisfied with the requirements.
@@ -40,6 +38,9 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
   }
   if(length(y)!= nrow(x)){
     stop("Error: The length of x and y are different")
+  }
+  if(any(y>1 | y<0)){
+    stop("Error: invalid dependent variable, all observations must be in [0, 1] ")
   }
   linkfun <- c("logit", "probit", "cloglog", "cauchit", "loglog")
   if (!linkfrac %in% linkfun){
@@ -90,7 +91,7 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
     k <- log(log(n))
   }
 
-  #The forth part, four different methods.
+  #The fourth part, four different methods.
   #forward stepwise
   forward <- function(x,y){
     x <- cbind(rep(1,nrow(x)), x)

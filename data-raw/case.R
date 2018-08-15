@@ -4,19 +4,18 @@ setwd("E:/Master/Programming with R")
 dat <- read.table("401kjae.txt")
 y <- dat[,1]
 x <- cbind(dat[,2], log(dat[,3]), log(dat[,3])^2, dat[,4], (dat[,4])^2, dat[,5])
-#colnames(x)
-#head(x)
+summary(dat)
+sqrt(diag(var(dat)))
 colnames(x) <- c("mrate", "lemp", "lemp2","age", "age2","sole")
 f <- frm(y, x, linkfrac = "logit", table = FALSE)
-summary(f)
-f
+f$p
 x <- as.data.frame(x, row.names = TRUE)
 head(x)
 #head(x)
 #Full Sample
 #OLS
 ols <- lm(y ~ x$mrate + x$lemp + x$lemp2 + x$age + x$age2 +x$sole)
-ols
+coef(ols)
 library(MASS)
 stepAIC(ols, direction = "both")
 #Subsample

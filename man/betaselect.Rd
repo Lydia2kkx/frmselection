@@ -20,16 +20,16 @@ betaselect(x, y, criterion, link, method)
 \value{
 A list contains information criterion, link function, model selection method,
 minimal value of information criterion, the order of variables which are chosen in the model,
-the names of corresonding variables and the estimated coefficients of them.
+the names of corresponding variables and the estimated coefficients of them.
 }
 \description{
 betaselect is used to select a formula-based model by information criterions of fractional regression models.
 }
 \examples{
-N <- 250
-u <- rnorm(N)
-X <- cbind(rnorm(N),rnorm(N), rnorm(N),rnorm(N))
-dimnames(X)[[2]] <- c("X1","X2","X3", "X4")
-ym <- exp(X[,1]+X[,2]+X[,3]+X[,4]+u)/(1+exp(X[,1]+X[,2]+X[,3]+X[,4]+u))
-y <- rbeta(N,ym*20,20*(1-ym))
+set.seed(123)
+library(bamlss)
+d <- GAMart()
+x <- data.frame(d$x1, d$x2, d$x3)
+y <- d$bnum
+betaselect(x, y)
 }
