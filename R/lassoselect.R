@@ -6,7 +6,7 @@
 #'
 #' @param x  The independent variables
 #' @param coefficent The coefficients estimated by bamlss()
-#' @param threshold The threshold controls which coefficients should be set to 0. Default value is 10e-3. Coefficients smaller than threshold would be set to 0.
+#' @param threshold The threshold controls which coefficients should be set to 0. Default value is 1e-3. Coefficients smaller than threshold would be set to 0.
 #'
 #' @return A list of results that contains lambda parameters of common and factor variables,
 #' lasso index which represents the index of coefficients that are set to be zero and the simplified coefficients.

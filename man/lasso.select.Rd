@@ -11,7 +11,7 @@ lasso.select(x, coefficient, threshold)
 
 \item{coefficent}{The coefficients estimated by bamlss()}
 
-\item{threshold}{The threshold controls which coefficients should be set to 0. Default value is 10e-3. Coefficients smaller than threshold would be set to 0.}
+\item{threshold}{The threshold controls which coefficients should be set to 0. Default value is 1e-3. Coefficients smaller than threshold would be set to 0.}
 }
 \value{
 A list of results that contains lambda parameters of common and factor variables,
