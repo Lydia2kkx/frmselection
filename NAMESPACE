@@ -3,3 +3,4 @@
 export(betaselect)
 export(frm_bamlss)
 export(frmselect)
+export(lasso.select)

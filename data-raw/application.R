@@ -74,34 +74,8 @@ f1 <- as.formula(paste(" ~ ", paste(xname[-ind], collapse = "+")))
 f2 <- as.formula(paste(" ~ ", paste(xname[ind], collapse = "+")))
 formula <- y ~ la(f1) + la(f2) #form the formula with two kinds of variables
 b <- bamlss(formula, data = d, family = frm_bamlss(link = "logit"), sampler = FALSE,
-            optimizer = lasso, nlambda = 100, upper = 1e+08, lower = 1e+03, multiple = FALSE)
-coefi <- coef(b)
-
-lasso.select <- function(x, coefficent, threshold = 1e-3){
-  n <- length(coefficent) #n is the number of the coefficients
-  ncommon <- length(x[,-ind]) #the number of the common variables
-  nfactor <- length(levels(x[,ind]))  #find the number of levels of factor variables
-  #nfactor <- length(unique(x[,ind]))
-  #Extract the penalized parameters of common and factor variables separately.
-  tau.common <- coefi[ncommon+1]
-  tau.factor <- coefi[ncommon+nfactor+1]
-  #The relation between tau and lambda is an inverse relationship
-  lambda.common <- 1/tau.common
-  names(lambda.common) <- "mu.s.la(f1).lambda"
-  lambda.factor <- 1/tau.factor
-  names(lambda.factor) <- "mu.s.la(f2).lambda"
-  index.tau <- c(ncommon+1, ncommon+nfactor+1)
-  coefi.new <- coefficent[-index.tau] #the new coeffients doesn't contain the penalized parameters
-  lasso.index <- NULL
-  #Users can set this threshold as whatever they like. The default value is 1e-3
-  for(i in 1:length(coefi.new)){
-    if(abs(coefi.new[i]) < threshold){
-      coefi.new[i] = 0
-      lasso.index <- c(lasso.index, i)
-    }
-  }
-  return(list(lambda.common = lambda.common, lambda.factor = lambda.factor, lasso.index = lasso.index, modified.coefficients = coefi.new))
-}
+            optimizer = lasso, nlambda = 100, upper = 1e+08, lower = 1e+03, multiple = TRUE)
+coefi <- lasso.coef(b)
 lasso.select(x, coefi)
 
 
@@ -110,14 +84,15 @@ suby <- subdat[,1]
 subx <- subdat[,-1]
 xname <- colnames(subx)
 ind1 <- sapply(subx, is.factor)
-ind1 <- which(ind) #find the index of the factor variables
+ind1 <- which(ind1) #find the index of the factor variables
 f11 <- as.formula(paste(" ~ ", paste(xname[-ind], collapse = "+")))
 f21 <- as.formula(paste(" ~ ", paste(xname[ind], collapse = "+")))
 formula1 <- y ~ la(f11) + la(f21) #form the formula with two kinds of variables
 b1 <- bamlss(formula1, data = subdat, family = "beta", sampler = FALSE,
-            optimizer = lasso, nlambda = 100, upper = 1e+08, lower = 1e+03,
-            multiple = FALSE)
-coefi1 <- coef(b1)
+            optimizer = lasso, nlambda = 10, upper = 10e+8, lower = 10e+3,
+            multiple = TRUE)
+coefi1 <- lasso.coef(b1)
+coefi1
 lasso.select(subx, coefi1)
 
 
