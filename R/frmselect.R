@@ -2,18 +2,19 @@
 #'
 #' frmselect is used to select a formula-based model by information criterions of fractional regression models.
 #'
-#' @usage frmselect(x, y, criterion="AIC",linkfrac="logit", method="forward")
+#' @usage frmselect(x, y, criterion="AIC",linkfrac="logit", method="forward", plotit=FALSE)
 #'
 #' @param x a numeric matrix, with column names, containing the values of the covariates.
 #' @param y a numeric vector containing the values of the response variable. It should be between 0 and 1.
 #' @param criterion model selection critetion. Available options: AIC, BIC, HQ.The default value is AIC.
 #' @param linkfrac link function, Available options: logit, probit, loglog, cloglog, cauchit.The default value is logit.
 #' @param method the mode of stepwise search and allsubsets. Available options: forward, backward, both, allsubsets.The default value is forward.
-#'
+#' @param plotit Default value is FALSE. If TRUE, it would plot the number of variables vs minimal criteria.
 #'
 #' @return A list contains information criterion, link function, model selection method,
-#' minimal value of information criterion, the order of variables which are chosen in the model,
-#' the names of corresponding variables and the estimated coefficients of them.
+#' minimal criteria of corresponding number of variables, minimal information criterion,
+#' the order of variables which are chosen in the model, the names of corresponding variables
+#' and the estimated coefficients of them.
 #'
 #' @export
 #'
@@ -25,7 +26,7 @@
 #' y <- d$bnum
 #' frmselect(x, y)
 
-frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forward"){
+frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forward", plotit = FALSE){
   #The first part, check the conditions whether the given command is satisfied with the requirements.
   if(any(missing(x) || missing(y))){
     stop("Error: Missing data")
@@ -110,6 +111,7 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
     first_step <- forward.1(x,y)
     ind <- first_step$index + 1
     criteria_old <- first_step$min + k * 2
+    plot_criteria <- criteria_old
     m <- 2
     repeat{
       result <- list()
@@ -126,6 +128,7 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
       }
       ind <- c(ind, which.min(criteria))
       criteria_old <- criteria_new
+      plot_criteria <- c(plot_criteria, criteria_old)
       m <- m + 1
     }
     min_criteria <- criteria_old
@@ -133,7 +136,7 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
     variable <- colnames(x)[ind]
     est <- frm::frm(y, x[, sort(ind), drop = FALSE], linkfrac = linkfrac, table = FALSE)
     coefficient <- est$p
-    return(list(min_criteria = min_criteria, index = index, variable = variable, coefficient = coefficient))
+    return(list(criteria = plot_criteria, min_criteria = min_criteria, index = index, variable = variable, coefficient = coefficient))
   }
 
   #backward stepwise
@@ -142,6 +145,7 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
     x <- cbind(rep(1,nrow(x)), x)
     p <- ncol(x)
     criteria_old <- -2*loglik(first_step$p, x, y, linkfrac= linkfrac) + k*p
+    plot_criteria <- criteria_old
     ind <- NULL
     m <- 1
     repeat{
@@ -159,6 +163,7 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
       }
       ind <- c(ind, which.min(criteria))
       criteria_old <- criteria_new
+      plot_criteria <- c(plot_criteria, criteria_old)
       m <- m + 1
     }
     min_criteria <- criteria_old
@@ -173,7 +178,7 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
       est <- frm::frm(y, x[, sort(index + 1), drop = FALSE], linkfrac = linkfrac, table = FALSE)
     }
     coefficient <- est$p
-    return(list(min_criteria = min_criteria, index = index, variable = variable, coefficient = coefficient))
+    return(list(criteria = plot_criteria, min_criteria = min_criteria, index = index, variable = variable, coefficient = coefficient))
   }
 
   #allsubsets
@@ -198,11 +203,12 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
       ind <- c(ind, list(com[, which.min(criteria)]))
     }
     min_criteria <- min(criteria_min_part)
+    plot_criteria <- criteria_min_part
     index <- ind[[which.min(criteria_min_part)]]
     variable <- colnames(x)[index+1]
     est <- frm::frm(y, x[, sort(index+1), drop = FALSE], linkfrac = linkfrac, table = FALSE)
     coefficient <- est$p
-    return(list(min_criteria = min_criteria, index = index, variable = variable, coefficient = coefficient))
+    return(list(criteria = plot_criteria, min_criteria = min_criteria, index = index, variable = variable, coefficient = coefficient))
   }
 
   #both
@@ -223,6 +229,7 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
     first_step <- both.1(x,y)
     ind <- first_step$index + 1
     criteria_old <- first_step$min + k * 2
+    plot_criteria <- criteria_old
     m <- 2
     repeat{
       result_for <- list()
@@ -259,6 +266,7 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
       }
       ind <- ind_for[[which.min(criteria_for)]]
       criteria_old <- criteria_new
+      plot_criteria <- c(plot_criteria, criteria_old)
       m <- m + 1
     }
     min_criteria <- criteria_old
@@ -266,7 +274,7 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
     variable <- colnames(x)[ind]
     est <- frm::frm(y, x[, sort(ind), drop = FALSE], linkfrac = linkfrac, table = FALSE)
     coefficient <- est$p
-    return(list(min_criteria = min_criteria, index = index, variable = variable, coefficient = coefficient))
+    return(list(criteria = plot_criteria, min_criteria = min_criteria, index = index, variable = variable, coefficient = coefficient))
   }
 
   if(method == "forward"){
@@ -283,6 +291,16 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
     result <- both(x, y)
   }
 
+  #If plotit = TRUE, then plot the number of variables vs the minimal criteria
+  if(plotit){
+    p <- ncol(x)
+    len <- length(result$criteria)
+    if(method == "backward"){
+      plot((p-len+1):p, result$criteria, type = "b", xlab = "Number of variables", ylab = "minimal criteria")
+    }else{
+      plot(1:len,result$criteria, type = "b", xlab = "Number of variables", ylab = "minimal criteria")
+    }
+  }
   #Return a list of results.
   return(c(criterion = criterion, linkfrac = linkfrac, method = method, result))
 }

@@ -4,7 +4,7 @@
 \alias{betaselect}
 \title{fractional model selection function based on beta regression}
 \usage{
-betaselect(x, y, criterion, link, method)
+betaselect(x, y, criterion, link, method, plotit)
 }
 \arguments{
 \item{x}{a numeric matrix or data frame, with column names, containing the values of the covariates.}
@@ -16,11 +16,14 @@ betaselect(x, y, criterion, link, method)
 \item{link}{link function, Available options: logit, probit, loglog, cloglog, log, cauchit.The default value is logit.}
 
 \item{method}{the mode of stepwise search and allsubsets. Available options: forward, backward, both, allsubsets.The default value is forward.}
+
+\item{plotit}{Default value is FALSE. If TRUE, it would plot the number of variables vs minimal criteria.}
 }
 \value{
 A list contains information criterion, link function, model selection method,
-minimal value of information criterion, the order of variables which are chosen in the model,
-the names of corresponding variables and the estimated coefficients of them.
+minimal criteria of corresponding number of variables, minimal information criterion,
+the order of variables which are chosen in the model, the names of corresponding variables
+and the estimated coefficients of them.
 }
 \description{
 betaselect is used to select a formula-based model by information criterions of fractional regression models.

@@ -4,7 +4,7 @@
 \alias{frmselect}
 \title{fractional model selection function based on quasi-likelihood}
 \usage{
-frmselect(x, y, criterion="AIC",linkfrac="logit", method="forward")
+frmselect(x, y, criterion="AIC",linkfrac="logit", method="forward", plotit=FALSE)
 }
 \arguments{
 \item{x}{a numeric matrix, with column names, containing the values of the covariates.}
@@ -16,11 +16,14 @@ frmselect(x, y, criterion="AIC",linkfrac="logit", method="forward")
 \item{linkfrac}{link function, Available options: logit, probit, loglog, cloglog, cauchit.The default value is logit.}
 
 \item{method}{the mode of stepwise search and allsubsets. Available options: forward, backward, both, allsubsets.The default value is forward.}
+
+\item{plotit}{Default value is FALSE. If TRUE, it would plot the number of variables vs minimal criteria.}
 }
 \value{
 A list contains information criterion, link function, model selection method,
-minimal value of information criterion, the order of variables which are chosen in the model,
-the names of corresponding variables and the estimated coefficients of them.
+minimal criteria of corresponding number of variables, minimal information criterion,
+the order of variables which are chosen in the model, the names of corresponding variables
+and the estimated coefficients of them.
 }
 \description{
 frmselect is used to select a formula-based model by information criterions of fractional regression models.

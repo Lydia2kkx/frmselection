@@ -22,10 +22,10 @@ coef(ols)
 #frmselect() to do the model selection
 #The four examples
 x <- as.matrix(x, row.names = TRUE)
-frmselect(x,y, criterion = "AIC",linkfrac = "logit")#The default is forward
-#frmselect(x,y, criterion = "AIC",linkfrac = "logit", method = "allsubsets")
-#frmselect(x,y, criterion = "AIC",linkfrac = "logit", method = "backward")
-#frmselect(x,y, criterion = "AIC",linkfrac = "logit", method = "both")
+frmselect(x,y, criterion = "AIC",linkfrac = "logit", plotit=TRUE)#The default is forward
+#frmselect(x,y, criterion = "AIC",linkfrac = "logit", method = "allsubsets", plotit=TRUE)
+#frmselect(x,y, criterion = "AIC",linkfrac = "logit", method = "backward", plotit=TRUE)
+#frmselect(x,y, criterion = "AIC",linkfrac = "logit", method = "both", plotit=TRUE)
 
 #betaselect() to do the model selection
 #The four examples
@@ -35,10 +35,10 @@ suby <- subdat[,1]
 subx <- subdat[,-1]
 subx <- as.matrix(subdat[,-1])
 nrow(subx)
-betaselect(subx, suby)
-#betaselect(subx, suby, method = "backward")
-#betaselect(subx, suby, method = "both")
-#betaselect(subx, suby, method = "allsubsets")
+betaselect(subx, suby, plotit = TRUE)
+#betaselect(subx, suby, method = "backward", plotit = TRUE)
+betaselect(subx, suby, method = "both", plotit = TRUE)
+#betaselect(subx, suby, method = "allsubsets", plotit = TRUE)
 
 #Another way by replacing 1 with 0.9999
 y[y==1] <- 0.9999
