@@ -22,10 +22,11 @@ coef(ols)
 #frmselect() to do the model selection
 #The four examples
 x <- as.matrix(x, row.names = TRUE)
-frmselect(x,y, criterion = "AIC",linkfrac = "logit", plotit=TRUE)#The default is forward
-#frmselect(x,y, criterion = "AIC",linkfrac = "logit", method = "allsubsets", plotit=TRUE)
-#frmselect(x,y, criterion = "AIC",linkfrac = "logit", method = "backward", plotit=TRUE)
+frmselect(x,y, plotit=TRUE)#The default is forward
+frmselect(x,y, criterion = "AIC",linkfrac = "logit", method = "allsubsets")
+frmselect(x,y, criterion = "AIC",linkfrac = "logit", method = "backward", plotit=TRUE)
 #frmselect(x,y, criterion = "AIC",linkfrac = "logit", method = "both", plotit=TRUE)
+frmselect(x,y, criterion = "BIC",linkfrac = "logit", method = "allsubsets", plotit=TRUE)
 
 #betaselect() to do the model selection
 #The four examples
@@ -37,7 +38,7 @@ subx <- as.matrix(subdat[,-1])
 nrow(subx)
 betaselect(subx, suby, plotit = TRUE)
 #betaselect(subx, suby, method = "backward", plotit = TRUE)
-betaselect(subx, suby, method = "both", plotit = TRUE)
+#betaselect(subx, suby, method = "both", plotit = TRUE)
 #betaselect(subx, suby, method = "allsubsets", plotit = TRUE)
 
 #Another way by replacing 1 with 0.9999

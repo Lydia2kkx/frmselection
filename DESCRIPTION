@@ -11,8 +11,16 @@ Description: This package performs a model selection procedure of fractional res
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
-Suggests: testthat
+Suggests: 
+    rmarkdown(>= 1.10)
 RoxygenNote: 6.1.0
-Imports: frm,
-    betareg,
-    bamlss
+Depends:
+    R (>= 3.4.0)
+Imports:
+    frm(>= 1.2.2),
+    betareg(>= 3.1-0),
+    bamlss(>= 1.0-0),
+    coda(>= 0.19-1),
+    colorspace(>= 1.3-2),
+    mgcv(>= 1.8-17),
+    nlme(>= 3.1-131)

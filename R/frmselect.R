@@ -108,17 +108,20 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
       index <- which.min(criteria)-1
       return(list(min_criteria = min_criteria, index = index))
     }
+    #First we choose the smallest criterion with one variable
     first_step <- forward.1(x,y)
-    ind <- first_step$index + 1
-    criteria_old <- first_step$min + k * 2
-    plot_criteria <- criteria_old
+    ind <- first_step$index + 1 #get the index of this chosen variable
+    criteria_old <- first_step$min + k * 2 #set the minimum criterion as old criterion
+    plot_criteria <- criteria_old #sign the minimum criterion as the first plot criterion
     m <- 2
+    #Repeat adding one variable at each time until no improvement in the criterion
     repeat{
       result <- list()
       criteria <- vector()
       for(i in 2:p){
         if(!(i %in% ind)){
           result[[i]] <- frm::frm(y, x[, sort(c(ind,i)), drop = FALSE], linkfrac = linkfrac, table = FALSE)
+          #compute the information criterion
           criteria[i] <- -2*loglik(result[[i]]$p, x[,sort(c(1,ind,i))], y, linkfrac= linkfrac) + k * (m+1)
         }
       }
@@ -128,7 +131,7 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
       }
       ind <- c(ind, which.min(criteria))
       criteria_old <- criteria_new
-      plot_criteria <- c(plot_criteria, criteria_old)
+      plot_criteria <- c(plot_criteria, criteria_old) #Add the minimal criterion when the number of variables increases
       m <- m + 1
     }
     min_criteria <- criteria_old
@@ -141,19 +144,22 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
 
   #backward stepwise
   backward <- function(x,y){
+    #Start with the full model
     first_step <- frm::frm(y, x, linkfrac= linkfrac, table = FALSE)
     x <- cbind(rep(1,nrow(x)), x)
     p <- ncol(x)
-    criteria_old <- -2*loglik(first_step$p, x, y, linkfrac= linkfrac) + k*p
-    plot_criteria <- criteria_old
+    criteria_old <- -2*loglik(first_step$p, x, y, linkfrac= linkfrac) + k*p #set the criterion as old criterion
+    plot_criteria <- criteria_old #sign the criterion as the first plot criterion
     ind <- NULL
     m <- 1
+    #Repeat substracting one variable at each time until no improvement in the criterion
     repeat{
       result <- list()
       criteria <- vector()
       for(i in 2:p){
         if(!(i %in% ind)){
           result[[i]] <- frm::frm(y, x[,-sort(c(1,ind,i)), drop = FALSE], linkfrac= linkfrac, table = FALSE)
+          #compute the information criterion
           criteria[i] <- -2*loglik(result[[i]]$p, x[,-sort(c(ind,i))], y, linkfrac= linkfrac) + k*(p-m)
         }
       }
@@ -163,15 +169,17 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
       }
       ind <- c(ind, which.min(criteria))
       criteria_old <- criteria_new
-      plot_criteria <- c(plot_criteria, criteria_old)
+      plot_criteria <- c(plot_criteria, criteria_old) #Add the minimal criterion when the number of variables increases
       m <- m + 1
     }
     min_criteria <- criteria_old
+    #If no index, then return the full model
     if(is.null(ind)){
       index <- ind
       est <- frm::frm(y, x[, -1, drop = FALSE], linkfrac = linkfrac, table = FALSE)
       variable <- colnames(x)
     }else{
+      #Else substract the index
       ind <- ind - 1
       index <- seq(1, p-1)[-ind]
       variable <- colnames(x)[index+1]
@@ -197,13 +205,14 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
       criteria <- vector()
       for(j in 1:count){
         result[[j]] <- frm::frm(y, x[, com[,j]+1, drop = FALSE], linkfrac= linkfrac, table = FALSE)
+        #compute the information criterion
         criteria[j] <- -2*loglik(result[[j]]$p, x[,(c(1,com[,j]+1))], y, linkfrac= linkfrac)+ k*(i+1)
       }
       criteria_min_part <- c(criteria_min_part, min(criteria))
       ind <- c(ind, list(com[, which.min(criteria)]))
     }
     min_criteria <- min(criteria_min_part)
-    plot_criteria <- criteria_min_part
+    plot_criteria <- criteria_min_part #get the minimal criteria with the increasing number of variables
     index <- ind[[which.min(criteria_min_part)]]
     variable <- colnames(x)[index+1]
     est <- frm::frm(y, x[, sort(index+1), drop = FALSE], linkfrac = linkfrac, table = FALSE)
@@ -226,11 +235,13 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
       index <- which.min(criteria)-1
       return(list(min_criteria = min_criteria, index = index))
     }
+    #First we choose the smallest criterion with one variable, same as the forward stepwise
     first_step <- both.1(x,y)
     ind <- first_step$index + 1
-    criteria_old <- first_step$min + k * 2
-    plot_criteria <- criteria_old
+    criteria_old <- first_step$min + k * 2 #set the criterion as old criterion
+    plot_criteria <- criteria_old #sign the criterion as the first plot criterion
     m <- 2
+    #Repeat the procedure of adding and then substracting any other variables until no improvement in criterion
     repeat{
       result_for <- list()
       criteria_for <- vector()
@@ -239,12 +250,16 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
       criteria_back_min <- vector()
       ind_for <- list()
       ind_back <- list()
+      #Every time adding one variable and get the information criterion, (forward step)
+      #we need to substract any other variables and compare the criterion. (backward step)
       for(i in 2:p){
+        #Forward part
         if(!(i %in% ind)){
           result_for[[i]] <- frm::frm(y, x[, sort(c(ind,i)), drop = FALSE], linkfrac = linkfrac, table = FALSE)
           criteria_for[i] <- -2*loglik(result_for[[i]]$p, x[,sort(c(1,ind,i))], y, linkfrac= linkfrac) + k*(m+1)
           ind_for[[i]] <- c(ind,i)
           l <- length(ind)
+          #Backward part
           if(l > 1){
             com <- combn(ind,l-1)
             for(j in 1:l){
@@ -266,7 +281,7 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
       }
       ind <- ind_for[[which.min(criteria_for)]]
       criteria_old <- criteria_new
-      plot_criteria <- c(plot_criteria, criteria_old)
+      plot_criteria <- c(plot_criteria, criteria_old) #Add the minimal criterion when the number of variables increases
       m <- m + 1
     }
     min_criteria <- criteria_old
@@ -279,7 +294,6 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
 
   if(method == "forward"){
     result <- forward(x, y)
-    method <- "forward"
   }
   if(method == "backward"){
     result <- backward(x, y)
@@ -296,11 +310,16 @@ frmselect <- function(x,y, criterion = "AIC", linkfrac = "logit", method = "forw
     p <- ncol(x)
     len <- length(result$criteria)
     if(method == "backward"){
-      plot((p-len+1):p, result$criteria, type = "b", xlab = "Number of variables", ylab = "minimal criteria")
+      plot((p-len+1):p,result$criteria, type = "b", xlab = "Number of variables", ylab = "minimal criteria",
+           main = paste(criterion, ", ", linkfrac, ", ", method))
+      text(result$criteria, labels = round(result$criteria, 2), cex = 0.6, pos = 3, col = "red")
     }else{
-      plot(1:len,result$criteria, type = "b", xlab = "Number of variables", ylab = "minimal criteria")
+      plot(1:len,result$criteria, type = "b", xlab = "Number of variables", ylab = "minimal criteria",
+           main = paste(criterion, ", ", linkfrac, ", ", method))
+      text(result$criteria, labels = round(result$criteria, 2), cex = 0.6, pos = 3, col = "red")
     }
   }
+
   #Return a list of results.
   return(c(criterion = criterion, linkfrac = linkfrac, method = method, result))
 }

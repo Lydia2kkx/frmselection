@@ -21,7 +21,7 @@ f$p
 b1 <- bamlss(formula, data = d, family = frm_bamlss(link = "probit") ,sampler = FALSE,
             multiple = FALSE)
 coef(b1)
-b2 <- bamlss(formula, data = d, start = coef(b1), sampler = FALSE,
+b2 <- bamlss(formula, data = d, family = frm_bamlss(link = "probit"), start = coef(b1), sampler = FALSE,
              multiple = FALSE) #doesn't work!
 f1 <- frm(y, x, linkfrac = "probit", table = FALSE)
 f1$p
