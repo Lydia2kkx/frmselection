@@ -1,4 +1,5 @@
 #The procedure of lasso selection
+#Here is an example of how to implement this procedure
 set.seed(123)
 library(bamlss)
 d <- GAMart()
@@ -20,6 +21,9 @@ coefi <- lasso.coef(b)
 #the lambda parameter(penalized with lasso) of factor variables and the intercept
 
 lasso.select <- function(x, coefficent, threshold = 1e-3){
+  if(!is.numeric(threshold)){
+    stop("Threshold should be a number!")
+  }
   n <- length(coefficent) #n is the number of the coefficients
   ncommon <- length(x[,-ind]) #the number of the common variables
   nfactor <- length(levels(x[,ind]))  #find the number of levels of factor variables
@@ -45,7 +49,6 @@ lasso.select <- function(x, coefficent, threshold = 1e-3){
   return(list(lambda.common = lambda.common, lambda.factor = lambda.factor,
               lasso.index = lasso.index, modified.coefficients = coefi.new))
 }
-
 a <- lasso.select(x, coefi)
 a$lambda.common
 a$lambda.factor

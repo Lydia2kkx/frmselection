@@ -7,7 +7,7 @@
 frm_bamlss(link = "logit",...)
 }
 \arguments{
-\item{link}{link function, Available options: logit, probit}
+\item{link}{link function, Available options: logit, probit. The default value is logit.}
 
 \item{...}{Arguments to pass to bamlss}
 }

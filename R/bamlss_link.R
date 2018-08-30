@@ -6,7 +6,7 @@
 #'
 #' @usage frm_bamlss(link = "logit",...)
 #'
-#' @param link link function, Available options: logit, probit
+#' @param link link function, Available options: logit, probit. The default value is logit.
 #' @param ... Arguments to pass to bamlss
 #'
 #' @details It is a family of bamlss package, can be used in the bamlss() function. The data type is
@@ -81,6 +81,7 @@ frm_bamlss <- function(link = "logit", ...)
       return(binomial2_bamlss(link, ...))
   }
 
+  #link logit
   rval <- list(
     "family" = "quasibinomial",
     "names" = "pi",

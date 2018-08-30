@@ -120,6 +120,9 @@ coefi
 
 ```{r}
 lasso.select <- function(x, coefficent, threshold = 1e-3){
+  if(!is.numeric(threshold)){
+    stop("Threshold should be a number!")
+  }
   n <- length(coefficent) #n is the number of the coefficients
   ncommon <- length(x[,-ind]) #the number of the common variables
   nfactor <- length(levels(x[,ind]))  #find the number of levels of factor variables
